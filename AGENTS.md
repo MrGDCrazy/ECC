@@ -176,6 +176,7 @@ tests/           — Test suite
 This repo is a Node.js CLI/plugin package (`ecc-universal`) plus a small Python library (`src/llm`, packaged via `pyproject.toml`). Dependencies are installed automatically by the startup update script (`npm ci --ignore-scripts` + `pip install -e '.[dev]'`); the notes below are the non-obvious caveats.
 
 - Package manager: `package.json` pins `yarn@4.9.2`, but CI and the update script use `npm ci --ignore-scripts` (both `package-lock.json` and `yarn.lock` are committed). Use npm for dev unless you specifically need the Yarn-hardened lane. `--ignore-scripts` is intentional and safe — the only lifecycle script is a harmless `postinstall` echo and no dependency needs a native build.
+- Yarn gotcha: the VM's default `yarn` is Classic v1, and running it rewrites the repo's Yarn Berry (`__metadata: version: 8`) `yarn.lock` into v1 format, producing a huge spurious diff. If you must use Yarn, activate v4 first via `corepack enable && corepack prepare yarn@stable --activate` (matches CI); otherwise stick to npm.
 - Lint: `npm run lint` (runs `eslint .` then `markdownlint '**/*.md'`).
 - JS tests: `node tests/run-all.js` (~3105 tests, ~2 min). The full gauntlet is `npm test` (adds catalog/registry/agent/skill/hook validators). Coverage: `npm run coverage`.
 - Python tests: `python3 -m pytest tests/test_*.py -m "not integration"`. Python entry-point scripts install to `~/.local/bin` (not on PATH) — always invoke tools via `python3 -m <tool>`.
