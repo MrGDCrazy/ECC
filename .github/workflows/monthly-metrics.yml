@@ -132,6 +132,12 @@ jobs:
               tableHeader
             ].join("\n");
 
+            const repoInfo = await github.rest.repos.get({ owner, repo });
+            if (!repoInfo.data.has_issues) {
+              console.log("Issues are disabled in this repository; skipping metrics snapshot issue.");
+              return;
+            }
+
             try {
               await github.rest.issues.getLabel({ owner, repo, name: label });
             } catch (error) {
